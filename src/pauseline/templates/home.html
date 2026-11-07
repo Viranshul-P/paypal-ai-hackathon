@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block body %}
+<main class="stack">
+  <div>
+    <h1>A pause before money leaves.</h1>
+    <p class="lede">Scammers don't steal passwords any more. They talk people into sending the money themselves: a "bank officer" with a safe account, "police" on a video call, a grandchild in trouble. Pauseline listens for that pressure, holds the payment with PayPal, and asks someone you trust before anything is sent.</p>
+  </div>
+  <div class="grid-2">
+    <a class="card" href="/send" style="text-decoration:none;color:inherit">
+      <h2>Send money</h2>
+      <p class="muted">For {{ payer_name }}. Pay someone the usual way. Most payments go straight through.</p>
+      <span class="btn btn-primary">Open</span>
+    </a>
+    <a class="card" href="/family" style="text-decoration:none;color:inherit">
+      <h2>Family view</h2>
+      <p class="muted">For {{ contact_name }}. See paused payments, the reasons, and approve or decline them.</p>
+      <span class="btn btn-secondary">Open</span>
+    </a>
+  </div>
+  <section class="card">
+    <h2>How it works</h2>
+    <ol class="steps">
+      <li><div><strong>You pay as usual</strong> and say what it's for, by voice or text.</div></li>
+      <li><div><strong>Pauseline checks for scam pressure</strong>: a caller directing you, threats, secrecy, gift cards or a "safe account", an unusual payee or amount. If unsure, it asks one or two yes/no questions.</div></li>
+      <li><div><strong>PayPal holds the money</strong> (an authorisation). Nothing is taken yet.</div></li>
+      <li><div><strong>Normal payments are released at once.</strong> Risky ones wait for {{ contact_name }}, or for a cooling-off period. If declined, the hold is cancelled and you are never charged.</div></li>
+    </ol>
+  </section>
+  <p class="small muted">Pauseline runs in PayPal's sandbox. No real money moves. Its AI runs on this device, so nothing you type or say is sent to an AI company. The AI can only add caution. It can never send money on its own.</p>
+</main>
+{% endblock %}

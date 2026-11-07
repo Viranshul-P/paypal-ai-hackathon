@@ -1,0 +1,18 @@
+{
+  "version": "v1",
+  "file": "v1.jsonl",
+  "sha256": "724527d071f343d03e1037b6cf2d2e1e5081b32cac4af1e90bc680e7e465855d",
+  "counts": {
+    "total": 112,
+    "scam": 58,
+    "benign": 54,
+    "coached": 10,
+    "dev": 37,
+    "test": 75,
+    "by_lang": {
+      "en": 80,
+      "hi": 12,
+      "hinglish": 20
+    }
+  }
+}

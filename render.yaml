@@ -1,0 +1,32 @@
+# Render Blueprint (free tier). Render dashboard -> New -> Blueprint -> pick this repo.
+# Secrets (sync: false) are entered once in the Render dashboard, never committed.
+services:
+  - type: web
+    name: pauseline
+    runtime: python
+    plan: free
+    buildCommand: pip install uv && uv sync --frozen --no-dev && uv run python -m pauseline.prepare
+    startCommand: uv run --no-sync uvicorn pauseline.app:create_app --factory --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.5
+      - key: PAYPAL_CLIENT_ID
+        sync: false
+      - key: PAYPAL_CLIENT_SECRET
+        sync: false
+      - key: PAUSELINE_DEMO_RECIPIENT_EMAIL
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+      - key: PAYPAL_WEBHOOK_ID
+        sync: false
+      - key: PAUSELINE_PUBLIC_URL
+        sync: false
+      - key: PAUSELINE_COOLING_OFF_SECONDS
+        value: "120"
+      # Free instances have no persistent disk: demo data resets on restart, which keeps the demo clean.
+      - key: PAUSELINE_DB
+        value: /tmp/pauseline.db
+      - key: PAUSELINE_LLM_CACHE
+        value: /tmp/llm_cache.db

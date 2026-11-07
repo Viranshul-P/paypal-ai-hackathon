@@ -121,3 +121,15 @@ def test_llm_down_falls_back_to_ml_and_rules():
     eng = RiskEngine(CONDITIONS["M_pauseline_full"], assessor(http))
     a = eng.assess(ctx("they told me to buy gift cards and keep it secret"))
     assert "unavailable" in a.assessor and a.decision is not Decision.ALLOW
+
+
+def test_context_cap_depends_on_llm_availability():
+    """With the LLM, unusual context alone never delays a payment; if the LLM is down, the no-LLM cap applies."""
+    big_new = PaymentContext(statement="hospital deposit for my husband's operation", amount=3000, payee=Payee(name="X"), history_median=60)
+    calm = {**JUDGEMENT, "risk": 0.05, "scam_type": "none", "red_flags": [], "suggested_questions": [], "message_to_payer": "", "summary_for_family": ""}
+    http, _ = chat_stub(calm)
+    up = RiskEngine(CONDITIONS["M_pauseline_full"], assessor(http)).assess(big_new)
+    assert up.decision is Decision.ALLOW
+    http_down, _ = chat_stub({}, status=500)
+    down = RiskEngine(CONDITIONS["M_pauseline_full"], assessor(http_down)).assess(big_new)
+    assert down.decision is Decision.COOL_OFF

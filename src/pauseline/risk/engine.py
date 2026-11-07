@@ -29,14 +29,18 @@ HOLD_AT = 0.70
 ASK_AT = 0.20  # ask clarifying questions when initial risk is at least this
 ML_FLOOR = 0.50  # classifier probabilities below this add nothing
 ML_MAX_WEIGHT = 0.75  # weight of a classifier probability of 1.0
-# LLM risk -> signal weight. LLMs over-flag large payments to new payees, so its weight is calibrated
-# on the dev split (eval/sweep_llm.py) instead of trusting the raw number.
+# LLM risk -> signal weight. Calibrated on dev with eval/sweep_llm.py: the raw score works best,
+# because clarifying questions (re-assessed by the LLM) correct its over-suspicion.
 LLM_FLOOR = 0.0
 LLM_MAX_WEIGHT = 1.0
-# Two tiers. Unusual context alone (new payee, big amount, no warning signs in the words) can at most
-# trigger a cooling-off (delay + family informed, auto-release); it can never hold money for the family.
-# A hold needs language evidence or a risky answer. Chosen on the dev split with eval/sweep.py.
+# Cap on risk from unusual context alone (new payee, big amount, no warning signs in the words).
+# Chosen on the dev split per engine (eval/sweep.py, EXPERIMENTS.md):
+# - without the LLM (and as the fallback when it is unavailable): 0.69, so context alone can at most
+#   trigger a cooling-off, never a family hold; this keeps coached victims, whose words are bland;
+# - with the LLM: 0.35, so context alone only triggers questions. The LLM already catches coached
+#   victims, and a looser cap only adds false cooling-offs (dev: false alarms 0.17 -> 0.06, no loss).
 CONTEXT_CAP = 0.69
+CONTEXT_CAP_WITH_LLM = 0.35
 
 
 @dataclass(frozen=True)
@@ -68,7 +72,9 @@ CONDITIONS: dict[str, EngineConfig] = {
         EngineConfig("G_rules_plus_questions", lexicon=True, questions=True),
         # need an LLM (Groq free tier or Ollama):
         EngineConfig("L_llm_only", context_rules=False, llm=True),
-        EngineConfig("M_pauseline_full", lexicon=True, ml=True, llm=True, questions=True, fast_path=True),
+        EngineConfig(
+            "M_pauseline_full", lexicon=True, ml=True, llm=True, questions=True, fast_path=True, context_cap=CONTEXT_CAP_WITH_LLM
+        ),
     )
 }
 FREE_CONDITIONS = [n for n, c in CONDITIONS.items() if not c.llm]
@@ -215,10 +221,13 @@ class RiskEngine:
         if cfg.questions and ctx.answers:
             answer_signals, reassure = qbank.answer_effect(ctx.answers)
             signals += answer_signals
-        def total(extra: list[Signal]) -> float:
+        def total(extra: list[Signal], llm_ok: bool = True) -> float:
             ctx_risk = combine(ctx_signals)
-            if cfg.context_cap is not None and not ctx.payee.blocked:
-                ctx_risk = min(ctx_risk, cfg.context_cap)
+            cap = cfg.context_cap
+            if cfg.llm and not llm_ok and cap is not None:
+                cap = max(cap, CONTEXT_CAP)  # LLM unavailable: fall back to the no-LLM operating point
+            if cap is not None and not ctx.payee.blocked:
+                ctx_risk = min(ctx_risk, cap)
             return (1 - (1 - ctx_risk) * (1 - combine(extra))) * reassure
 
         rule_risk = total(signals)
@@ -242,7 +251,7 @@ class RiskEngine:
                 self.llm_errors.append(str(e))
                 assessor_name += " (language model unavailable, ML + rules only)"
 
-        risk = total(signals)
+        risk = total(signals, llm_ok=judgement is not None or not cfg.llm or (cfg.fast_path and routine))
         signals = ctx_signals + signals
         decision = decide(risk, ctx)
         scam_type = judgement.scam_type if judgement and judgement.scam_type != "none" else lexicon_scam_type(signals)

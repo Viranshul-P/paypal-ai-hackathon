@@ -1,0 +1,2 @@
+# Keep the benchmark byte-identical across platforms (its sha256 is in MANIFEST.json)
+eval/scenarios/*.jsonl text eol=lf

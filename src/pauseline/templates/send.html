@@ -10,73 +10,80 @@
   <!-- Step 1: who and how much -->
   <section id="step-details" class="stack">
     <div>
-      <h1>Hello {{ payer_name }}. Who would you like to pay?</h1>
-      <p class="lede">Pauseline checks every payment for signs of a scam before your money leaves.</p>
+      <h1 data-hi="नमस्ते {{ payer_name }}। आप किसे पैसे भेजना चाहते हैं?">Hello {{ payer_name }}. Who would you like to pay?</h1>
+      <p class="lede" data-hi="आपके पैसे जाने से पहले Pauseline हर पेमेंट में ठगी के संकेत देखता है।">Pauseline checks every payment for signs of a scam before your money leaves.</p>
     </div>
 
-    <div class="payees" role="group" aria-label="Choose who to pay">
-      {% for p in payees if not p.blocked %}
-      <button type="button" class="payee" data-payee="{{ p.id }}" aria-pressed="false">
-        <strong>{{ p.name }}</strong>
-        <span>{{ p.relationship or ('Saved' if p.known else 'New to you') }}</span>
-      </button>
-      {% endfor %}
-      <button type="button" class="payee" id="new-payee-toggle" aria-pressed="false">
-        <strong>Someone new</strong>
-        <span>Add a name and email</span>
-      </button>
-    </div>
-
-    <div id="new-payee" class="card stack hidden">
-      <div><label for="np-name">Their name</label><input id="np-name" type="text" autocomplete="off"></div>
-      <div><label for="np-email">Their PayPal email</label><input id="np-email" type="email" autocomplete="off"></div>
-    </div>
-
-    <div class="card stack">
+    <div class="slip stack">
       <div>
-        <label for="amount">How much? ({{ currency }})</label>
+        <span class="field-label" id="pay-label" data-hi="किसे भेजना है">Pay</span>
+        <div class="payees" role="group" aria-labelledby="pay-label">
+          {% for p in payees if not p.blocked %}
+          <button type="button" class="payee" data-payee="{{ p.id }}" aria-pressed="false">
+            <strong>{{ p.name }}</strong>
+            <span>{{ p.relationship or ('Saved' if p.known else 'New to you') }}</span>
+          </button>
+          {% endfor %}
+          <button type="button" class="payee" id="new-payee-toggle" aria-pressed="false">
+            <strong data-hi="कोई नया व्यक्ति">Someone new</strong>
+            <span data-hi="नाम और ईमेल जोड़ें">Add a name and email</span>
+          </button>
+        </div>
+      </div>
+
+      <div id="new-payee" class="stack hidden">
+        <div><label for="np-name" data-hi="उनका नाम">Their name</label><input id="np-name" type="text" autocomplete="off"></div>
+        <div><label for="np-email" data-hi="उनका PayPal ईमेल">Their PayPal email</label><input id="np-email" type="email" autocomplete="off"></div>
+      </div>
+
+      <div>
+        <label for="amount"><span data-hi="रकम">Amount</span> ({{ currency }})</label>
         <input id="amount" class="amount-input" type="number" inputmode="decimal" min="1" step="0.01" placeholder="0">
       </div>
+
       <div>
-        <label for="statement">What is this payment for? Say it in your own words.</label>
+        <label for="statement" data-hi="यह पेमेंट किसलिए है? अपने शब्दों में बताएं।">What is this payment for? Say it in your own words.</label>
         <div class="field-row">
-          <textarea id="statement" placeholder="For example: Rahul's college books"></textarea>
+          <textarea id="statement" placeholder="For example: Rahul's college books" data-hi-placeholder="जैसे: राहुल की कॉलेज की किताबें"></textarea>
           <button type="button" id="mic" class="btn btn-secondary mic" aria-pressed="false" title="Speak instead of typing">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
             <span class="sr-label">Speak</span>
           </button>
         </div>
-        <p class="small muted">You can type or speak in English or Hindi. <select id="mic-lang" aria-label="Speech language" style="width:auto;padding:4px 8px;display:inline-block"><option value="en-IN">English</option><option value="hi-IN">हिन्दी</option></select></p>
+        <div class="lang-line small muted">
+          <span data-hi="बोलने की भाषा">Speaking in</span>
+          <select id="mic-lang" aria-label="Speech language"><option value="en-IN">English</option><option value="hi-IN">हिन्दी</option></select>
+        </div>
       </div>
     </div>
 
     <p id="details-error" class="banner stop hidden" role="alert"></p>
-    <button id="continue" class="btn btn-primary btn-block" type="button">Continue</button>
+    <button id="continue" class="btn btn-primary btn-block" type="button" data-hi="आगे बढ़ें">Continue</button>
   </section>
 
   <!-- Step 2: clarifying questions -->
   <section id="step-questions" class="stack hidden">
     <div>
-      <h1>Two quick questions</h1>
-      <p class="lede">Scammers often tell people what to say. Your honest answers keep your money safe. Nobody else sees them except {{ contact_name }}.</p>
+      <h1 id="questions-title">Quick questions</h1>
+      <p class="lede" data-hi="ठग अक्सर बताते हैं कि क्या बोलना है। आपके सच्चे जवाब आपके पैसे बचाते हैं। ये जवाब सिर्फ़ {{ contact_name }} देख सकते हैं।">Scammers often tell people what to say. Your honest answers keep your money safe. Only {{ contact_name }} sees them.</p>
     </div>
     <div id="questions" class="stack"></div>
-    <button id="answers-continue" class="btn btn-primary btn-block" type="button" disabled>Continue</button>
+    <button id="answers-continue" class="btn btn-primary btn-block" type="button" data-hi="आगे बढ़ें" disabled>Continue</button>
   </section>
 
   <!-- Step 3: review and pay with PayPal -->
   <section id="step-pay" class="stack hidden">
     <h1 id="pay-title">Ready to pay</h1>
     <div id="pay-notice" class="banner warn hidden"></div>
-    <div class="card stack">
-      <p class="lede" style="margin:0">Your money is <strong>held safely by PayPal</strong> until the payment is confirmed. If anything looks wrong, the hold is cancelled and you are not charged.</p>
+    <div class="slip stack">
+      <p class="lede" data-hi="पेमेंट पक्का होने तक PayPal आपके पैसे रोककर रखता है। कुछ गड़बड़ लगे तो यह रोक हट जाती है और आपसे पैसा नहीं कटता।">PayPal holds your money until the payment is confirmed. If anything looks wrong, the hold is cancelled and you are not charged.</p>
       {% if paypal_live %}
         <div id="paypal-buttons"></div>
       {% else %}
-        <button id="demo-pay" class="btn btn-primary btn-block" type="button">Pay with PayPal (demo mode)</button>
-        <p class="small muted">Demo mode: no PayPal keys configured, so a simulated PayPal is used.</p>
+        <button id="demo-pay" class="btn btn-primary btn-block" type="button">Pay with PayPal (demo)</button>
+        <p class="small muted">This demo has no PayPal keys, so PayPal is simulated.</p>
       {% endif %}
-      <button id="cancel-before" class="btn btn-secondary btn-block" type="button">Cancel</button>
+      <button id="cancel-before" class="btn btn-secondary btn-block" type="button" data-hi="रद्द करें">Cancel</button>
     </div>
   </section>
 
@@ -84,7 +91,7 @@
   <section id="step-result" class="stack hidden" aria-live="polite">
     <div id="result-banner" class="banner"></div>
     <div id="result-actions" class="btn-row"></div>
-    <a class="btn btn-secondary btn-block" href="/send">Make another payment</a>
+    <a class="btn btn-secondary btn-block" href="/send" data-hi="एक और पेमेंट करें">Make another payment</a>
   </section>
 </main>
 {% endblock %}

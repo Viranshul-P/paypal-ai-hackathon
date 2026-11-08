@@ -11,6 +11,8 @@ from dotenv import load_dotenv
 ROOT = Path(__file__).resolve().parents[2]
 load_dotenv(ROOT / ".env")
 
+DEFAULT_FAMILY_PIN = "1234"  # local demo only; the lock screen shows it while it is in use
+
 
 def _bool(name: str, default: bool) -> bool:
     raw = os.getenv(name)
@@ -34,7 +36,7 @@ class Settings:
     currency: str = field(default_factory=lambda: os.getenv("PAUSELINE_CURRENCY", "USD"))
 
     # AI, all free. Always on: rules + phrase lexicon + our locally trained ML classifier.
-    # LLM layer: Groq's free tier (hosted open-weight Llama 3.1 8B) when GROQ_API_KEY is set,
+    # LLM layer: Groq's free tier (hosted open-weight gpt-oss-120b) when GROQ_API_KEY is set,
     # or Ollama on your own machine. PAUSELINE_LLM_PROVIDER = auto | groq | ollama | none.
     groq_api_key: str = field(default_factory=lambda: os.getenv("GROQ_API_KEY", ""))
     llm_provider_setting: str = field(default_factory=lambda: os.getenv("PAUSELINE_LLM_PROVIDER", "auto").lower())
@@ -53,6 +55,10 @@ class Settings:
     # Public site protection: payment checks per visitor per minute.
     assess_per_minute: int = field(default_factory=lambda: int(os.getenv("PAUSELINE_ASSESS_PER_MINUTE", "8")))
 
+    # The trusted contact's PIN. It guards family decisions and setup, so that someone directing the
+    # payer over the phone cannot have them approve their own held payment.
+    family_pin: str = field(default_factory=lambda: os.getenv("PAUSELINE_FAMILY_PIN", "") or DEFAULT_FAMILY_PIN)
+
     # Policy
     cooling_off_seconds: int = field(
         default_factory=lambda: int(os.getenv("PAUSELINE_COOLING_OFF_SECONDS", str(24 * 3600)))
@@ -63,6 +69,10 @@ class Settings:
     public_base_url: str = field(
         default_factory=lambda: os.getenv("PAUSELINE_PUBLIC_URL", "http://127.0.0.1:8000")
     )
+
+    @property
+    def family_pin_is_default(self) -> bool:
+        return self.family_pin == DEFAULT_FAMILY_PIN
 
     @property
     def llm_provider(self) -> str:

@@ -189,6 +189,17 @@ Chart: `docs/figures/results-test.png`.
 
 **Cost:** every run above, including 3 models × 2 splits, sweeps and robustness, cost $0. It used about 700 Groq free-tier requests over the day, and most sweeps were answered entirely from the cache.
 
+### 2026-11-08: reproducibility check, held-out test split (run `verify-llm-test`)
+
+Same frozen M configuration, fresh LLM cache (118 Groq calls, 0 errors), run to check that the reported result reproduces. No tuning followed from it.
+
+| Run | Scam recall (95% CI) | False alarms (95% CI) | Hard-stop recall | Hard-stop false alarms | Coached recall |
+|---|---|---|---|---|---|
+| M, reported (`llm-test-v2`) | 0.95 (0.83–0.99) | 0.17 (0.08–0.32) | 0.74 | 0.00 | 0.71 |
+| M, re-run (`verify-llm-test`) | 0.97 (0.87–0.99) | 0.17 (0.08–0.32) | 0.80 | 0.00 | 0.86 |
+
+The LLM's answers vary between runs even at temperature 0, so individual scenarios can change. False alarms and hard-stop false alarms were identical. We keep the lower `llm-test-v2` figures as the headline. This is the third evaluation of the M engine on this split.
+
 ### Future work
 - Benchmark v2: new held-out scenarios written by someone who has not seen v1, for a single clean evaluation of the frozen configuration.
 - Real conversations: partner with a scam-awareness group to collect (consented, anonymised) descriptions.

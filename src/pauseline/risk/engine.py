@@ -9,7 +9,9 @@ Components, each producing risk signals:
 
 Risk = noisy-OR of all signal weights, times a small reassurance factor from honest answers.
 Design rules:
-1. Every component can only ADD risk; only the payer's reassuring answers lower it, a little.
+1. Every signal can only ADD risk; the payer's reassuring answers lower it a little. One exception
+   by design: when the LLM is working, risk from context alone is capped lower (CONTEXT_CAP_WITH_LLM),
+   so a healthy LLM can let an unusual but clean payment through. No AI component can move money.
 2. A blocked payee is always blocked (deterministic).
 3. Questions are asked once, only when there is some doubt.
 4. Every experiment condition in eval/ is an EngineConfig, so product and research share code.

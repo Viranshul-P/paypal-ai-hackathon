@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import contextlib
+import hmac
 import os
 import re
 import threading
@@ -15,7 +16,7 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import HTMLResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 from pauseline.config import get_settings
 from pauseline.paypal.client import build_gateway
@@ -50,6 +51,14 @@ class NewPayee(BaseModel):
     known: bool = True
     blocked: bool = False
 
+    @field_validator("email")
+    @classmethod
+    def valid_email(cls, v: str) -> str:
+        v = v.strip()
+        if v and not re.fullmatch(r"[^@\s]+@[^@\s]+\.[^@\s]+", v):
+            raise ValueError("please enter a valid email address")
+        return v
+
 
 class IntentRequest(BaseModel):
     text: str = Field(default="", max_length=2000)
@@ -82,7 +91,7 @@ def seed_demo(store: Store) -> None:
 
 
 def create_app(service: PauselineService | None = None) -> FastAPI:
-    settings = get_settings()
+    settings = service.settings if service is not None else get_settings()
     if service is None:
         store = Store(settings.db_path)
         seed_demo(store)
@@ -132,6 +141,23 @@ def create_app(service: PauselineService | None = None) -> FastAPI:
                 raise HTTPException(429, "Too many payment checks in a minute. Please wait a moment and try again.")
             q.append(now)
 
+    # Family decisions and setup need the trusted contact's PIN. Wrong guesses are limited across
+    # all visitors, because the forwarded address can be spoofed.
+    pin_failures: deque = deque()
+
+    def require_family(request: Request) -> None:
+        now = time.time()
+        with hits_lock:
+            while pin_failures and now - pin_failures[0] > 60:
+                pin_failures.popleft()
+            if len(pin_failures) >= 20:
+                raise HTTPException(429, "Too many wrong PINs. Please wait a minute and try again.")
+        given = request.headers.get("x-family-pin", "")
+        if not hmac.compare_digest(given.encode(), settings.family_pin.encode()):
+            with hits_lock:
+                pin_failures.append(now)
+            raise HTTPException(401, "That PIN is not right.")
+
     def page_ctx(request: Request, **extra) -> dict:
         return {
             "request": request,
@@ -139,6 +165,8 @@ def create_app(service: PauselineService | None = None) -> FastAPI:
             "paypal_client_id": settings.paypal_client_id,
             "currency": settings.currency,
             "ai_mode": ai_mode(),
+            "cloud_ai": bool(svc.engine.config.llm and svc.engine.assessor is not None),
+            "demo_pin": settings.family_pin if settings.family_pin_is_default else "",
             "assessor": svc.engine.config.name,
             "payer_name": svc.store.get_setting("payer_name", "You"),
             "contact_name": svc.store.get_setting("contact_name", "your trusted contact"),
@@ -175,7 +203,12 @@ def create_app(service: PauselineService | None = None) -> FastAPI:
     def _public(t: dict) -> dict:
         a = t.get("assessment") or {}
         lang_hi = any("ऀ" <= ch <= "ॿ" for ch in t.get("statement", ""))
+        payee_row = svc.store.get_payee(t["payee_id"]) or {}
         return {
+            # Money was captured but PayPal did not accept the payout to the recipient.
+            "delivery_failed": bool(
+                t["status"] == "released" and settings.paypal_use_payouts and payee_row.get("email") and not t.get("payout_batch_id")
+            ),
             "id": t["id"],
             "status": t["status"],
             "decision": t.get("decision"),
@@ -194,7 +227,7 @@ def create_app(service: PauselineService | None = None) -> FastAPI:
             ],
             "assessor": a.get("assessor", ""),
             "questions": [
-                {"id": q, "text": QUESTIONS[q].hi if lang_hi else QUESTIONS[q].en}
+                {"id": q, "text": QUESTIONS[q].hi if lang_hi else QUESTIONS[q].en, "text_hi": QUESTIONS[q].hi}
                 for q in (a.get("questions") or [])
                 if q in QUESTIONS
             ],
@@ -259,7 +292,8 @@ def create_app(service: PauselineService | None = None) -> FastAPI:
     # -- API: family ----------------------------------------------------------
 
     @app.get("/api/family/overview")
-    def api_family():
+    def api_family(request: Request):
+        require_family(request)
         transfers = [_public(t) for t in svc.store.list_transfers(50)]
         return {
             "pending": [t for t in transfers if t["status"] == "held"],
@@ -268,7 +302,8 @@ def create_app(service: PauselineService | None = None) -> FastAPI:
         }
 
     @app.post("/api/transfers/{tid}/family")
-    def api_family_decide(tid: str, body: FamilyDecision):
+    def api_family_decide(tid: str, body: FamilyDecision, request: Request):
+        require_family(request)
         return _public(_wrap(svc.family_decide, tid, body.approve, body.note))
 
     # -- API: setup -----------------------------------------------------------
@@ -278,11 +313,14 @@ def create_app(service: PauselineService | None = None) -> FastAPI:
         return svc.store.list_payees()
 
     @app.post("/api/payees")
-    def api_add_payee(body: NewPayee):
+    def api_add_payee(body: NewPayee, request: Request):
+        if body.known or body.blocked:  # the payer can add someone new, but only family can vouch for them
+            require_family(request)
         return svc.store.add_payee(body.name, body.email, body.relationship, body.known, body.blocked)
 
     @app.patch("/api/payees/{pid}")
-    def api_update_payee(pid: str, body: PayeeUpdate):
+    def api_update_payee(pid: str, body: PayeeUpdate, request: Request):
+        require_family(request)
         svc.store.update_payee(pid, **body.model_dump(exclude_none=True))
         return svc.store.get_payee(pid)
 
@@ -313,6 +351,7 @@ def create_app(service: PauselineService | None = None) -> FastAPI:
     @app.post("/api/demo/reset")
     def api_demo_reset(request: Request):
         """Start the shared demo household fresh. Held PayPal authorisations are voided first."""
+        require_family(request)
         check_rate(request)
         for t in svc.store.list_transfers(500):
             if t["status"] == "held":

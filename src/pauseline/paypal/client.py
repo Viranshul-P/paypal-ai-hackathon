@@ -86,12 +86,15 @@ class PayPalClient:
     def _access_token(self) -> str:
         if self._token and time.time() < self._token_expires - 60:
             return self._token
-        r = self._http.post(
-            "/v1/oauth2/token",
-            auth=(self._id, self._secret),
-            data={"grant_type": "client_credentials"},
-            headers={"Accept": "application/json"},
-        )
+        try:
+            r = self._http.post(
+                "/v1/oauth2/token",
+                auth=(self._id, self._secret),
+                data={"grant_type": "client_credentials"},
+                headers={"Accept": "application/json"},
+            )
+        except httpx.HTTPError as e:
+            raise PayPalError(f"Could not reach PayPal: {type(e).__name__}") from e
         if r.status_code != 200:
             raise PayPalError(f"PayPal auth failed: {r.text[:300]}", r.status_code)
         body = r.json()
@@ -107,7 +110,10 @@ class PayPalClient:
         }
         if request_id:
             headers["PayPal-Request-Id"] = request_id  # idempotency: retries never double-charge
-        r = self._http.request(method, path, json=json, headers=headers)
+        try:
+            r = self._http.request(method, path, json=json, headers=headers)
+        except httpx.HTTPError as e:
+            raise PayPalError(f"Could not reach PayPal: {type(e).__name__}") from e
         if r.status_code >= 400:
             try:
                 body = r.json()

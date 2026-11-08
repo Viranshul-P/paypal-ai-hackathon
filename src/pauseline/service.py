@@ -65,10 +65,14 @@ class PauselineService:
 
     # -- 1. create + assess -------------------------------------------------
     def create_transfer(self, payee_id: str, amount: float, statement: str, hour_of_day: int | None = None) -> dict:
-        if amount <= 0:
+        if round(float(amount), 2) <= 0:
             raise FlowError("amount must be positive")
-        if self.store.get_payee(payee_id) is None:
+        payee = self.store.get_payee(payee_id)
+        if payee is None:
             raise FlowError("unknown payee")
+        if self.paypal.live and self.settings.paypal_use_payouts and not payee["email"]:
+            # Without an email the money would be captured but could never be delivered.
+            raise FlowError("this payee has no PayPal email")
         hour = datetime.now().hour if hour_of_day is None else hour_of_day
         t = self.store.create_transfer(
             payee_id=payee_id,
@@ -87,7 +91,11 @@ class PauselineService:
         t = self._transfer(tid)
         if t["status"] != TransferStatus.DRAFT.value:
             raise FlowError("questions can only be answered before paying")
+        if t["answers"]:
+            raise FlowError("these questions have already been answered")  # no retrying for a softer result
         clean = {k: v.lower() for k, v in answers.items() if k in t["asked"] and v.lower() in {"yes", "no"}}
+        if set(clean) != set(t["asked"]):
+            raise FlowError("please answer every question with yes or no")
         a = self.engine.assess(replace_answers(self._context(t), clean))
         a.questions = []  # ask once
         self.store.log(tid, "answered", {"answers": clean, "risk": a.risk, "decision": a.decision.value})
@@ -103,9 +111,13 @@ class PauselineService:
         if t["status"] == TransferStatus.AWAITING_PAYER.value and t["order_id"]:
             return t
         p = self.store.get_payee(t["payee_id"]) or {}
-        order = self.paypal.create_order(
-            amount=t["amount"], currency=t["currency"], reference_id=tid, description=f"Pauseline payment to {p.get('name', '')}"
-        )
+        try:
+            order = self.paypal.create_order(
+                amount=t["amount"], currency=t["currency"], reference_id=tid, description=f"Pauseline payment to {p.get('name', '')}"
+            )
+        except PayPalError as e:
+            self.store.log(tid, "paypal.error", {"step": "order", "error": str(e), "debug_id": e.debug_id})
+            raise FlowError(f"PayPal could not start this payment: {e}") from e
         self.store.log(tid, "paypal.order_created", {"order_id": order.order_id})
         return self.store.update_transfer(tid, order_id=order.order_id, status=TransferStatus.AWAITING_PAYER.value)
 

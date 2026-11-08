@@ -23,6 +23,8 @@ services:
         sync: false
       - key: PAUSELINE_PUBLIC_URL
         sync: false
+      - key: PAUSELINE_FAMILY_PIN
+        sync: false
       - key: PAUSELINE_COOLING_OFF_SECONDS
         value: "120"
       # Free instances have no persistent disk: demo data resets on restart, which keeps the demo clean.

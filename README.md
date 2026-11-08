@@ -4,7 +4,7 @@
 
 > Status: hackathon build (Threws Odyssey 2026 and PayPal AI Hackathon). PayPal **sandbox** only, so no real money moves. **Free to run:** our own on-device ML model plus an open-weight LLM on Groq's free tier, with no paid APIs.
 >
-> **Live demo:** TODO (Railway URL) · **Results:** [EXPERIMENTS.md](EXPERIMENTS.md) · **Deploy:** [docs/DEPLOY.md](docs/DEPLOY.md)
+> **Live demo:** https://pauseline-production.up.railway.app · **Results:** [EXPERIMENTS.md](EXPERIMENTS.md) · **Deploy:** [docs/DEPLOY.md](docs/DEPLOY.md)
 
 ## The problem
 

@@ -19,7 +19,7 @@ from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel, Field, field_validator
 
 from pauseline.config import get_settings
-from pauseline.paypal.client import build_gateway
+from pauseline.paypal.client import PayPalError, build_gateway
 from pauseline.risk.engine import SIGNAL_LABELS, build_engine
 from pauseline.risk.questions import QUESTIONS
 from pauseline.service import FlowError, PauselineService
@@ -378,11 +378,17 @@ def create_app(service: PauselineService | None = None) -> FastAPI:
     # -- PayPal webhooks ------------------------------------------------------
     @app.post("/webhooks/paypal")
     async def paypal_webhook(request: Request):
-        event = await request.json()
+        try:
+            event = await request.json()
+        except ValueError:
+            return JSONResponse({"error": "body is not valid JSON"}, status_code=400)
         if svc.paypal.live:
             if not settings.paypal_webhook_id:
                 return JSONResponse({"error": "PAYPAL_WEBHOOK_ID not set"}, status_code=503)
-            ok = await asyncio.to_thread(svc.paypal.verify_webhook, dict(request.headers), event, settings.paypal_webhook_id)
+            try:
+                ok = await asyncio.to_thread(svc.paypal.verify_webhook, dict(request.headers), event, settings.paypal_webhook_id)
+            except PayPalError:  # PayPal refuses to check a request with missing or malformed signature headers
+                ok = False
             if not ok:
                 return JSONResponse({"error": "signature verification failed"}, status_code=400)
         svc.handle_webhook(event)

@@ -249,6 +249,20 @@ def test_paypal_outage_is_a_clear_error_not_a_crash(svc):
         svc.start_payment(t["id"])
 
 
+def test_bad_webhooks_are_rejected_not_crashed(tmp_path):
+    def refuses(*args):
+        raise PayPalError("INVALID_REQUEST", 400)
+
+    store = Store(tmp_path / "w.db")
+    settings = Settings(db_path=tmp_path / "w.db", paypal_webhook_id="wh-1")
+    gateway = FakePayPal(live=True)
+    gateway.verify_webhook = refuses
+    client = TestClient(create_app(PauselineService(store, gateway, RiskEngine(PRODUCT_CONFIG), settings)))
+    assert client.post("/webhooks/paypal", json={}).status_code == 400
+    assert client.post("/webhooks/paypal", content=b"not json").status_code == 400
+    assert store.events() == []
+
+
 def test_failed_payout_is_reported_not_shown_as_sent(svc):
     def down(**kwargs):
         raise PayPalError("PAYOUTS_NOT_ENABLED", 403)

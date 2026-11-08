@@ -12,7 +12,7 @@ Ready-to-paste text for both hackathons. Replace every `TODO` (live URL, video l
 
 - **Name:** Pauseline
 - **Tagline:** A pause before money leaves. Scam-aware PayPal payments with a trusted family contact.
-- **Live demo:** TODO (Railway URL)
+- **Live demo:** https://pauseline-production.up.railway.app
 - **Repo:** https://github.com/Viranshul-P/threws-odyssey-2026 (public, MIT)
 - **Video:** TODO (YouTube, under 3 minutes)
 - **Team:** Viranshul, Priyanshu Doshi, Kuldeep Goklani (Team Beyonders)

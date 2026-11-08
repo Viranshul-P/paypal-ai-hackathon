@@ -17,8 +17,8 @@ Scammers now talk people into sending money themselves: a "bank officer" with a 
 | LLM layer: gpt-oss-120b on Groq's free tier, cache, quota guard, fallback | ✅ Live-tested |
 | Web app: payer screens (voice, Hindi), family dashboard, setup, demo reset | ✅ |
 | Benchmark: 112 scenarios, 8 conditions, 3 LLMs, sweeps, speech-noise robustness | ✅ Final test results in EXPERIMENTS.md |
-| Tests | ✅ 34 passing |
-| Deployment files (render.yaml, webhook script, DEPLOY.md) | ✅ Ready, not yet deployed |
+| Tests | ✅ 35 passing |
+| Deployment | ✅ Live on Railway: https://pauseline-production.up.railway.app |
 | Submission kit (Devpost + Unstop text, video script) | ✅ docs/SUBMISSION.md |
 
 **Headline result (held-out test split):**
@@ -33,8 +33,8 @@ Scammers now talk people into sending money themselves: a "bank officer" with a 
 |---|---|---|---|
 | 1 | ~~`git push` the `pauseline` branch, then merge it into `main`~~ Done | Viranshul | done |
 | 2 | Rotate the PayPal secret and Groq key, then make the repo public | Viranshul | 8 Nov |
-| 3 | Deploy on Railway (follow `docs/DEPLOY.md`), then register webhooks with `scripts/register_webhook.py` | Friend + Viranshul | 9–10 Nov |
-| 4 | Put the live URL in README.md and docs/SUBMISSION.md | Anyone | after deploy |
+| 3 | ~~Deploy on Railway and register webhooks~~ Done | Kuldeep | done |
+| 4 | ~~Put the live URL in README.md and docs/SUBMISSION.md~~ Done | Kuldeep | done |
 | 5 | Talk to 3–5 families about scam calls; add 2–3 quotes to the README and the deck | Everyone | 10 Nov |
 | 6 | A Hindi speaker checks the Hindi/Hinglish sentences in `eval/scenarios/build_v1.py` and `src/pauseline/risk/training_data.py` | Kuldeep | 10 Nov |
 | 7 | Confirm the headline statistics on the primary pages (ic3.gov, PIB) | Anyone | 10 Nov |

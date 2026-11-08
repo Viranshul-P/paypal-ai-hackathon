@@ -37,5 +37,5 @@ It prints `PAYPAL_WEBHOOK_ID=...`. Add that to the Railway variables. PayPal eve
 - **Trial credit:** $5 for up to 30 days. Check usage on the Railway dashboard before judging.
 - **Demo data resets on every restart.** There is no persistent disk, which keeps the demo clean. **Setup → Reset demo** also clears it.
 - **AI quota:** the site uses Groq's free tier (about 1,000 checks a day) and protects it with a cache, a budget guard and per-visitor limits. If the quota ever runs out, the site keeps working with the on-device ML model, and the footer shows "ML only".
-- **Updating:** every push to `main` triggers a new deploy.
+- **Updating:** the live service was deployed from a local folder, so pushes do not deploy by themselves. Run `railway up --service pauseline` from the repo after pulling `main`.
 - `render.yaml` is kept for anyone who prefers Render's free tier.

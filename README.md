@@ -2,7 +2,7 @@
 
 **A pause before money leaves.** Pauseline protects people from being talked into sending money to scammers. It listens for scam pressure in how a payment is described, holds the money with a PayPal authorisation, and asks a trusted family member before anything is sent.
 
-> Status: hackathon build (Threws Odyssey 2026 and PayPal AI Hackathon). PayPal **sandbox** only, so no real money moves. **Free to run:** our own on-device ML model plus an open-weight LLM on Groq's free tier, with no paid APIs.
+> Status: hackathon build (PayPal AI Hackathon). PayPal **sandbox** only, so no real money moves. **Free to run:** our own on-device ML model plus an open-weight LLM on Groq's free tier, with no paid APIs.
 >
 > **Live demo:** https://pauseline-production.up.railway.app · **Results:** [EXPERIMENTS.md](EXPERIMENTS.md) · **Deploy:** [docs/DEPLOY.md](docs/DEPLOY.md)
 
@@ -144,4 +144,4 @@ tests/
 
 ## License
 
-[MIT](LICENSE). Team Beyonders: Viranshul ([@Viranshul-P](https://github.com/Viranshul-P)), Priyanshu Doshi ([@Priyanshu-byte-coder](https://github.com/Priyanshu-byte-coder)), Kuldeep Goklani ([@Kuldeeep18](https://github.com/Kuldeeep18)). Hackathon notes: [docs/HACKATHON.md](docs/HACKATHON.md).
+[MIT](LICENSE). Team Beyonders: Viranshul ([@Viranshul-P](https://github.com/Viranshul-P)), Priyanshu Doshi ([@Priyanshu-byte-coder](https://github.com/Priyanshu-byte-coder)), Kuldeep Goklani ([@Kuldeeep18](https://github.com/Kuldeeep18)).

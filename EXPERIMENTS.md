@@ -1,6 +1,6 @@
 # Experiments
 
-Keep this log honest and dated. Record every run you cite, every change you made after looking at results, and what failed. **All numbers here must come from real runs** in `eval/results/` (Threws disqualifies fabricated results). Everything here is free to run on a laptop.
+Keep this log honest and dated. Record every run you cite, every change you made after looking at results, and what failed. **All numbers here must come from real runs** in `eval/results/`. Everything here is free to run on a laptop.
 
 ## Research questions
 

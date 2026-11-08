@@ -1,6 +1,6 @@
 # Submission kit
 
-Ready-to-paste text for both hackathons. Replace every `TODO` (live URL, video link) before submitting.
+Ready-to-paste text for the PayPal AI Hackathon. Replace every `TODO` (live URL, video link) before submitting.
 
 **Headline statistics (secondary sources; confirm on the primary pages before quoting):**
 - **US:** people aged 60+ reported about **$7.75 billion** in losses to the FBI's Internet Crime Complaint Center in 2025, up 59% on 2024 (FBI IC3 2025 report, as summarised by [HousingWire](https://www.housingwire.com/articles/fbi-seniors-cybercrime-2025/)). Primary: [ic3.gov](https://www.ic3.gov).
@@ -13,7 +13,6 @@ Ready-to-paste text for both hackathons. Replace every `TODO` (live URL, video l
 - **Name:** Pauseline
 - **Tagline:** A pause before money leaves. Scam-aware PayPal payments with a trusted family contact.
 - **Live demo:** https://pauseline-production.up.railway.app
-- **Repo:** https://github.com/Viranshul-P/threws-odyssey-2026 (public, MIT)
 - **Video:** TODO (YouTube, under 3 minutes)
 - **Team:** Viranshul, Priyanshu Doshi, Kuldeep Goklani (Team Beyonders)
 
@@ -78,52 +77,6 @@ Scams have changed. Criminals no longer need your password: they phone, pose as 
 **AI tools used:**
 - In the product: our scikit-learn classifier; gpt-oss-120b via Groq (risk second opinion, messages, question choice).
 - To build it: Claude Code (code, research, documentation, drafting benchmark scenarios, all reviewed by the team).
-
----
-
-## Unstop (Threws Odyssey), track: Cybersecurity
-
-**Problem statement**
-Authorised push payment scams, such as fake bank "safe accounts", "digital arrest" video calls and fake family emergencies, trick the account owner into sending money themselves. Because the owner authenticates and approves, conventional fraud detection (which looks for unauthorised access) lets the payment through. The victims are often older adults, and families find out after the money is gone.
-
-**Proposed solution**
-Pauseline puts a pause between social-engineering pressure and the payment:
-1. It detects scam pressure from the payer's own words plus the payment context.
-2. When uncertain, it asks targeted yes/no questions.
-3. It holds every payment as a PayPal authorisation.
-4. It escalates risky ones to a trusted family member, who approves or declines before any money moves.
-
-**Key features**
-- A two-tier hold: a cooling-off period, or a family decision.
-- Voice input in English, Hindi and Hinglish.
-- A family dashboard showing the evidence.
-- Explainable AI: the phrases behind each decision.
-- A deployed, free, real PayPal sandbox integration.
-
-**Technology stack:** Python, FastAPI, scikit-learn, Groq (gpt-oss-120b, open-weight), PayPal REST APIs (Orders, Payments, Payouts, Webhooks), SQLite, React, Tailwind CSS, Web Speech API, Railway.
-
-**Research and experimentation (summary)**
-- **Benchmark:** 112 synthetic scenarios with 9 scam types; 10 coached victims; hard legitimate cases; English, Hindi and Hinglish.
-- **Method:**
-  - 8 conditions, from bank-style rules to the full system;
-  - a dev/test split with all tuning on dev;
-  - leakage control between training and test data;
-  - speech-recognition noise robustness.
-- **Results (held-out test split, 75 scenarios):**
-  - **Bank-style rules:** catch 56% of scams, hold 0% for the family, flag 39% of legitimate payments.
-  - **Pauseline:** catches **95%** (95% CI 83–99%), holds **74%**, flags 17% of legitimate payments (all only delayed), and **holds 0%** of them.
-  - Coached victims: 71% caught.
-  - Hindi and Hinglish scams: 100% caught.
-  - 15% speech-recognition noise: 95% still caught.
-  - Our ML model alone: 0% false alarms.
-  - LLM comparison: gpt-oss-120b vs gpt-oss-20b vs Qwen 3.8 27B on dev.
-  - One documented re-tuning (on dev) after the first test run, with both results reported.
-
-**Dataset and external resources:**
-- the synthetic benchmark (in the repo);
-- public scam typologies from the [FBI IC3](https://www.ic3.gov), the [US FTC](https://reportfraud.ftc.gov) and Indian advisories on "digital arrest" (CERT-In; [cybercrime.gov.in](https://cybercrime.gov.in));
-- PayPal sandbox;
-- Groq free tier.
 
 ---
 

@@ -14,7 +14,7 @@ Backend stays FastAPI with its JSON API. Frontend is being rebuilt as React and 
 
 - **Payer (demo persona Kamla):** an older adult in India paying family, bills and doctors, possibly with a scammer on the phone directing them. Types or speaks in English, Hindi or Hinglish.
 - **Trusted contact (demo persona Asha, her daughter):** reviews held payments and approves or declines them.
-- **Judges (first priority for this build):** Threws Odyssey and PayPal AI Hackathon panels, watching a 3-minute video and a live Round 2 demo. The UI must make the scam-hold story obvious and look like a real, modern fintech product, while staying readable for older users.
+- **Judges (first priority for this build):** PayPal AI Hackathon panels, watching a 3-minute video and trying the live demo. The UI must make the scam-hold story obvious and look like a real, modern fintech product, while staying readable for older users.
 
 ## Product Purpose
 

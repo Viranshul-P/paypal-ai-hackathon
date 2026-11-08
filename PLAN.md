@@ -1,7 +1,7 @@
 # Pauseline: plan and status
 
-> One project for **Threws Odyssey 2026** (track: **Cybersecurity**, since FinTech is missing from the form) and the **PayPal AI Hackathon** (targets: Grand Prize, **Most Impactful**, Best Use of PayPal + AI).
-> Deadlines: Threws **12 Nov, 11:00 PM IST**; PayPal **13 Nov, 1:30 AM IST**. Threws Round 2: **15 Nov, 11 AM IST**.
+> One project for the **PayPal AI Hackathon** (targets: Grand Prize, **Most Impactful**, Best Use of PayPal + AI).
+> Deadline: **13 Nov, 1:30 AM IST** (12 Nov, 12:00 pm Pacific).
 
 ## The idea in one paragraph
 
@@ -19,7 +19,7 @@ Scammers now talk people into sending money themselves: a "bank officer" with a 
 | Benchmark: 112 scenarios, 8 conditions, 3 LLMs, sweeps, speech-noise robustness | ✅ Final test results in EXPERIMENTS.md |
 | Tests | ✅ 35 passing |
 | Deployment | ✅ Live on Railway: https://pauseline-production.up.railway.app |
-| Submission kit (Devpost + Unstop text, video script) | ✅ docs/SUBMISSION.md |
+| Submission kit (Devpost text, video script) | ✅ docs/SUBMISSION.md |
 
 **Headline result (held-out test split):**
 - Pauseline catches **95%** of scams and holds **74%** for the family, against 56% and 0% for bank-style rules.
@@ -39,8 +39,7 @@ Scammers now talk people into sending money themselves: a "bank officer" with a 
 | 6 | A Hindi speaker checks the Hindi/Hinglish sentences in `eval/scenarios/build_v1.py` and `src/pauseline/risk/training_data.py` | Kuldeep | 10 Nov |
 | 7 | Confirm the headline statistics on the primary pages (ic3.gov, PIB) | Anyone | 10 Nov |
 | 8 | Record the video (script in docs/SUBMISSION.md) on the live site; upload to YouTube as public | Everyone | 11 Nov |
-| 9 | Submit: Threws on Unstop (Cybersecurity track), then Devpost (teammates added; test credentials in the private field) | Viranshul | 12 Nov |
-| 10 | Round 2 deck and rehearsal (problem → demo → results chart → method → limits) | Everyone | 13–14 Nov |
+| 9 | Submit on Devpost (teammates added; test credentials in the private field) | Viranshul | 12 Nov |
 
 ## Cost: zero
 

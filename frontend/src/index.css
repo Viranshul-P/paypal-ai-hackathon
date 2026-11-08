@@ -1,0 +1,77 @@
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: 'Baloo 2', 'Noto Sans Devanagari', system-ui, sans-serif;
+
+  --color-ground: #ffefe2;
+  --color-backdrop: #ffefe2;
+  --color-card: #ffffff;
+  --color-tint: #fff6ef;
+  --color-ink: #2b1a12;
+  --color-ink-2: #65493a;
+  --color-line: #f0d9c6;
+
+  /* Orange only ever marks something you can press. */
+  --color-action: #d0400a;
+  --color-action-press: #a93206;
+  --color-action-soft: #ffe4d5;
+
+  --color-held: #7f4500;
+  --color-held-soft: #ffe2ad;
+  --color-held-ground: #ffd68c;
+  --color-sent: #0a6241;
+  --color-sent-soft: #d5f3e4;
+  --color-sent-ground: #c4efd9;
+  --color-stop: #a8231b;
+  --color-stop-soft: #fbdfdb;
+  --color-stop-ground: #f9d2cd;
+
+  --radius-card: 26px;
+  --shadow-card: 0 8px 24px rgb(120 60 20 / 0.09);
+  --shadow-device: 0 24px 60px rgb(120 60 20 / 0.22);
+}
+
+@layer base {
+  html {
+    font-size: 18px;
+    color-scheme: light;
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    margin: 0;
+    background: var(--color-ground);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    line-height: 1.4;
+    caret-color: var(--color-action);
+  }
+  button,
+  a {
+    -webkit-tap-highlight-color: transparent;
+  }
+  button:not(:disabled) {
+    cursor: pointer;
+  }
+  ::selection {
+    background: var(--color-held-soft);
+    color: var(--color-ink);
+  }
+  :focus-visible {
+    outline: 3px solid var(--color-action);
+    outline-offset: 2px;
+  }
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+    line-height: 1.12;
+  }
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-line) transparent;
+  }
+}
+
+@utility tabular {
+  font-variant-numeric: tabular-nums;
+}

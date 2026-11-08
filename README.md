@@ -59,7 +59,7 @@ Conventional fraud checks look for stolen accounts. Here the owner is the one pa
 | **Open-weight LLM** | **gpt-oss-120b on Groq's free tier** (chosen over gpt-oss-20b and Qwen 3.8 27B on our dev split). Gives a second opinion on risk, writes the calm message to the payer and the summary for the family in their language, and picks the most useful questions. Built for a shared free quota: answer cache, request/token budget guard, per-visitor rate limit, and automatic fallback to the on-device model. Can also run locally through Ollama |
 | Speech | Browser Web Speech API for voice input and spoken results |
 
-If the free LLM quota ever runs out, Pauseline keeps working on the on-device model, and the page footer shows which mode is active.
+If the free LLM quota ever runs out, Pauseline keeps working on the on-device model, and the Family view footer shows which mode is active.
 
 AI tools used to build it: Claude Code assisted with code, research and documentation, including drafting the benchmark scenarios. The team made the design decisions and reviewed all output.
 
@@ -101,7 +101,9 @@ cp .env.example .env          # optional: PayPal sandbox keys and a free Groq ke
 uv run pauseline              # http://127.0.0.1:8000 (first start trains the classifier, ~8 s)
 ```
 
-With no keys it runs fully offline: a fake PayPal with the same state rules, and the on-device model. The page footer shows the active mode.
+With no keys it runs fully offline: a fake PayPal with the same state rules, and the on-device model. The Family view footer shows the active mode.
+
+The built frontend is committed in `src/pauseline/web`, so Python alone runs the app. To change the UI: `cd frontend && npm install && npm run dev` (with the API running), then `npm run build`.
 
 **Try it:**
 - **Send money:** pay "Rahul" 80 for "college books" → released at once.
@@ -124,7 +126,8 @@ src/pauseline/
                llm.py (Groq / Ollama, quota guard, cache) · engine.py (decision policy)
   paypal/      client.py (sandbox REST client + fake with the same rules)
   service.py   payment lifecycle: assess → ask → hold → release / cancel
-  app.py       FastAPI: payer screens, family dashboard, API, webhooks
+  app.py       FastAPI: JSON API, webhooks, serves the built React app (web/)
+frontend/      React + Tailwind source, modular components adapted from Watermelon UI
 eval/
   scenarios/   build_v1.py → v1.jsonl (frozen, sha256 in MANIFEST.json)
   run.py · sweep.py · sweep_llm.py · check_leakage.py · perturb.py (speech noise) · charts.py

@@ -8,7 +8,7 @@ About 15 minutes. You need a Railway account (sign up with GitHub, no card) and 
 | `PAYPAL_CLIENT_SECRET` | PayPal sandbox app secret |
 | `PAUSELINE_DEMO_RECIPIENT_EMAIL` | Sandbox *personal* account that receives demo payouts |
 | `GROQ_API_KEY` | Groq free-tier API key |
-| `PAUSELINE_FAMILY_PIN` | PIN for Family view and Setup. While it is `1234` (the default), the lock screen shows it |
+| `PAUSELINE_FAMILY_PIN` | 4-digit PIN for Family view and Setup. While it is `1234` (the default), the lock screen shows it |
 | `PAUSELINE_COOLING_OFF_SECONDS` | `120` for demos |
 
 ## 1. Create the service
@@ -21,7 +21,7 @@ Under the service's **Variables** tab, add the values above. Then open **Setting
 ## 3. Check it
 - The deploy log should end with `Application startup complete`.
 - Open `https://<your-site>/health` → `{"ok": true}`.
-- Open the home page. The footer should say **PayPal sandbox. AI: on-device ML + gpt-oss-120b (Groq).**
+- Open **Family view**. The footer should say **PayPal sandbox. AI: on-device ML + gpt-oss-120b (Groq).**
 - Go to **Send money**, pay Rahul 80 for "college books", and log in on the PayPal button with the sandbox **payer** account → "Sent".
 
 ## 4. Register PayPal webhooks (once you have the URL)
@@ -36,6 +36,6 @@ It prints `PAYPAL_WEBHOOK_ID=...`. Add that to the Railway variables. PayPal eve
 ## Good to know
 - **Trial credit:** $5 for up to 30 days. Check usage on the Railway dashboard before judging.
 - **Demo data resets on every restart.** There is no persistent disk, which keeps the demo clean. **Setup → Reset demo** also clears it.
-- **AI quota:** the site uses Groq's free tier (about 1,000 checks a day) and protects it with a cache, a budget guard and per-visitor limits. If the quota ever runs out, the site keeps working with the on-device ML model, and the footer shows "ML only".
+- **AI quota:** the site uses Groq's free tier (about 1,000 checks a day) and protects it with a cache, a budget guard and per-visitor limits. If the quota ever runs out, the site keeps working with the on-device ML model, and the Family view footer shows "ML only".
 - **Updating:** the live service was deployed from a local folder, so pushes do not deploy by themselves. Run `railway up --service pauseline` from the repo after pulling `main`.
 - `render.yaml` is kept for anyone who prefers Render's free tier.

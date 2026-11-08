@@ -52,7 +52,7 @@ Scams have changed. Criminals no longer need your password: they phone, pose as 
   3. **An open-weight LLM** (gpt-oss-120b on Groq's free tier). It writes the calm message to the payer and the summary for the family, and suggests the best questions.
 - **Safety principle:** no AI component can move money. Money moves only through deterministic policy or a human, and family decisions need a PIN, so a caller cannot talk the payer into approving their own hold.
 - **Built for a free public quota:** response caching, a token/request budget guard, per-visitor rate limits, and automatic fallback to the on-device model.
-- **Stack:** FastAPI, SQLite, vanilla JS. Hosted on Railway.
+- **Stack:** FastAPI, SQLite, React, Tailwind. Hosted on Railway.
 
 **Challenges**
 - LLMs flag large payments to new payees as scams: tuition, contractors, hospital deposits. Down-weighting the LLM only lost recall on our dev split, so we kept its raw score and changed the policy: with the LLM working, unusual context alone only triggers questions, and the answers let the LLM re-assess. A family hold needs warning signs in the words or a risky answer.
@@ -73,7 +73,7 @@ Scams have changed. Criminals no longer need your password: they phone, pose as 
 - More Indian languages.
 - Whisper-based voice input.
 
-**Built with:** paypal-orders-v2, paypal-payments, paypal-payouts, paypal-webhooks, paypal-js-sdk, python, fastapi, scikit-learn, groq, gpt-oss, sqlite, javascript, web-speech-api, railway
+**Built with:** paypal-orders-v2, paypal-payments, paypal-payouts, paypal-webhooks, paypal-js-sdk, python, fastapi, scikit-learn, groq, gpt-oss, sqlite, react, tailwindcss, web-speech-api, railway
 
 **AI tools used:**
 - In the product: our scikit-learn classifier; gpt-oss-120b via Groq (risk second opinion, messages, question choice).
@@ -100,7 +100,7 @@ Pauseline puts a pause between social-engineering pressure and the payment:
 - Explainable AI: the phrases behind each decision.
 - A deployed, free, real PayPal sandbox integration.
 
-**Technology stack:** Python, FastAPI, scikit-learn, Groq (gpt-oss-120b, open-weight), PayPal REST APIs (Orders, Payments, Payouts, Webhooks), SQLite, JavaScript, Web Speech API, Railway.
+**Technology stack:** Python, FastAPI, scikit-learn, Groq (gpt-oss-120b, open-weight), PayPal REST APIs (Orders, Payments, Payouts, Webhooks), SQLite, React, Tailwind CSS, Web Speech API, Railway.
 
 **Research and experimentation (summary)**
 - **Benchmark:** 112 synthetic scenarios with 9 scam types; 10 coached victims; hard legitimate cases; English, Hindi and Hinglish.

@@ -9,3 +9,4 @@ eval/results/*/
 !eval/results/README.md
 .DS_Store
 models/
+node_modules/

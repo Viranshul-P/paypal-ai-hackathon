@@ -13,9 +13,8 @@ from collections import defaultdict, deque
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import HTMLResponse, JSONResponse, Response
+from fastapi.responses import FileResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel, Field, field_validator
 
 from pauseline.config import get_settings
@@ -26,7 +25,7 @@ from pauseline.service import FlowError, PauselineService
 from pauseline.store import Store
 
 HERE = Path(__file__).parent
-templates = Jinja2Templates(directory=str(HERE / "templates"))
+WEB = HERE / "web"  # the built React app (frontend/)
 
 
 class NewTransfer(BaseModel):
@@ -116,7 +115,7 @@ def create_app(service: PauselineService | None = None) -> FastAPI:
 
     app = FastAPI(title="Pauseline", lifespan=lifespan)
     app.state.service = svc
-    app.mount("/static", StaticFiles(directory=str(HERE / "static")), name="static")
+    app.mount("/assets", StaticFiles(directory=str(WEB / "assets"), check_dir=False), name="assets")
 
     def ai_mode() -> str:
         a = svc.engine.assessor
@@ -158,38 +157,27 @@ def create_app(service: PauselineService | None = None) -> FastAPI:
                 pin_failures.append(now)
             raise HTTPException(401, "That PIN is not right.")
 
-    def page_ctx(request: Request, **extra) -> dict:
+    # -- pages: every route is the React app -----------------------------------
+    @app.get("/", include_in_schema=False)
+    @app.get("/send", include_in_schema=False)
+    @app.get("/family", include_in_schema=False)
+    @app.get("/setup", include_in_schema=False)
+    def spa():
+        return FileResponse(WEB / "index.html")
+
+    @app.get("/api/config")
+    def api_config():
         return {
-            "request": request,
             "paypal_live": svc.paypal.live,
             "paypal_client_id": settings.paypal_client_id,
             "currency": settings.currency,
             "ai_mode": ai_mode(),
             "cloud_ai": bool(svc.engine.config.llm and svc.engine.assessor is not None),
             "demo_pin": settings.family_pin if settings.family_pin_is_default else "",
-            "assessor": svc.engine.config.name,
             "payer_name": svc.store.get_setting("payer_name", "You"),
             "contact_name": svc.store.get_setting("contact_name", "your trusted contact"),
             "contact_relationship": svc.store.get_setting("contact_relationship", ""),
-            **extra,
         }
-
-    # -- pages ----------------------------------------------------------------
-    @app.get("/", response_class=HTMLResponse)
-    def home(request: Request):
-        return templates.TemplateResponse(request, "home.html", page_ctx(request, active="home"))
-
-    @app.get("/send", response_class=HTMLResponse)
-    def send_page(request: Request):
-        return templates.TemplateResponse(request, "send.html", page_ctx(request, active="send", payees=svc.store.list_payees()))
-
-    @app.get("/family", response_class=HTMLResponse)
-    def family_page(request: Request):
-        return templates.TemplateResponse(request, "family.html", page_ctx(request, active="family"))
-
-    @app.get("/setup", response_class=HTMLResponse)
-    def setup_page(request: Request):
-        return templates.TemplateResponse(request, "setup.html", page_ctx(request, active="setup", payees=svc.store.list_payees()))
 
     # -- API: payer -----------------------------------------------------------
 

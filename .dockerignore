@@ -4,6 +4,7 @@
 models
 data
 docs
+frontend
 tests
 eval/results
 **/__pycache__

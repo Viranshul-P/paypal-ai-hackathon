@@ -12,13 +12,13 @@ Ready-to-paste text for both hackathons. Replace every `TODO` (live URL, video l
 
 - **Name:** Pauseline
 - **Tagline:** A pause before money leaves. Scam-aware PayPal payments with a trusted family contact.
-- **Live demo:** TODO (Render URL)
+- **Live demo:** TODO (Railway URL)
 - **Repo:** https://github.com/Viranshul-P/threws-odyssey-2026 (public, MIT)
 - **Video:** TODO (YouTube, under 3 minutes)
 - **Team:** Viranshul, Priyanshu Doshi, Kuldeep Goklani (Team Beyonders)
 
 ### Test access for judges
-- The live site needs no login.
+- The payer side needs no login. **Family view** and **Setup** need the family PIN, which is in the private submission field.
 - On the PayPal button, log in with the sandbox payer account. The email and password are in the private submission field, not in the repo.
 - **Family view** is at `/family`. **Setup → Reset demo** clears the shared household.
 
@@ -35,7 +35,7 @@ Scams have changed. Criminals no longer need your password: they phone, pose as 
 - Pauseline checks for scam pressure in their own words and in the payment's context. When unsure, it asks one or two yes/no questions, such as "Is someone on the phone with you right now, telling you what to do?"
 - **Every payment is first held as a PayPal authorisation:**
   - normal payments are captured at once and paid out to the recipient;
-  - unusual ones get a cooling-off period, and the family member is told;
+  - unusual ones get a cooling-off period and appear in the family member's view;
   - payments with clear warning signs wait for a **trusted family member**, who sees the payer's words, the warning signs and the answers, then approves (capture + payout) or declines (void).
 - A declined payment never charges the payer.
 
@@ -50,12 +50,12 @@ Scams have changed. Criminals no longer need your password: they phone, pose as 
   1. **Our own ML classifier**: TF-IDF over words and character n-grams, plus logistic regression. Trained on 2,800 synthetic English, Hindi and Hinglish sentences, decontaminated against our benchmark, and explaining each decision with the phrases that drove it.
   2. **An English/Hindi scam-phrase lexicon and context rules.**
   3. **An open-weight LLM** (gpt-oss-120b on Groq's free tier). It writes the calm message to the payer and the summary for the family, and suggests the best questions.
-- **Safety principle:** every AI component can only add caution. Money moves only through deterministic policy or a human.
+- **Safety principle:** no AI component can move money. Money moves only through deterministic policy or a human, and family decisions need a PIN, so a caller cannot talk the payer into approving their own hold.
 - **Built for a free public quota:** response caching, a token/request budget guard, per-visitor rate limits, and automatic fallback to the on-device model.
-- **Stack:** FastAPI, SQLite, vanilla JS. Hosted on Render.
+- **Stack:** FastAPI, SQLite, vanilla JS. Hosted on Railway.
 
 **Challenges**
-- LLMs flag large payments to new payees as scams: tuition, contractors, hospital deposits. We calibrated the LLM's weight on a dev split and introduced two tiers: unusual context alone can only cool off, while a hold needs warning signs in the words or a risky answer.
+- LLMs flag large payments to new payees as scams: tuition, contractors, hospital deposits. Down-weighting the LLM only lost recall on our dev split, so we kept its raw score and changed the policy: with the LLM working, unusual context alone only triggers questions, and the answers let the LLM re-assess. A family hold needs warning signs in the words or a risky answer.
 - Our first training set leaked phrases from our test set. A leakage check caught it, and we added decontamination.
 
 **Accomplishments**
@@ -73,7 +73,7 @@ Scams have changed. Criminals no longer need your password: they phone, pose as 
 - More Indian languages.
 - Whisper-based voice input.
 
-**Built with:** paypal-orders-v2, paypal-payments, paypal-payouts, paypal-webhooks, paypal-js-sdk, python, fastapi, scikit-learn, groq, gpt-oss, sqlite, javascript, web-speech-api, render
+**Built with:** paypal-orders-v2, paypal-payments, paypal-payouts, paypal-webhooks, paypal-js-sdk, python, fastapi, scikit-learn, groq, gpt-oss, sqlite, javascript, web-speech-api, railway
 
 **AI tools used:**
 - In the product: our scikit-learn classifier; gpt-oss-120b via Groq (risk second opinion, messages, question choice).
@@ -100,7 +100,7 @@ Pauseline puts a pause between social-engineering pressure and the payment:
 - Explainable AI: the phrases behind each decision.
 - A deployed, free, real PayPal sandbox integration.
 
-**Technology stack:** Python, FastAPI, scikit-learn, Groq (gpt-oss-120b, open-weight), PayPal REST APIs (Orders, Payments, Payouts, Webhooks), SQLite, JavaScript, Web Speech API, Render.
+**Technology stack:** Python, FastAPI, scikit-learn, Groq (gpt-oss-120b, open-weight), PayPal REST APIs (Orders, Payments, Payouts, Webhooks), SQLite, JavaScript, Web Speech API, Railway.
 
 **Research and experimentation (summary)**
 - **Benchmark:** 112 synthetic scenarios with 9 scam types; 10 coached victims; hard legitimate cases; English, Hindi and Hinglish.
@@ -135,4 +135,4 @@ Pauseline puts a pause between social-engineering pressure and the payment:
 | 0:20–0:45 | Send money → Rahul, 80, "college books" (voice) | "Kamla pays her grandson as usual. Pauseline sees nothing wrong, so PayPal captures it and pays Rahul at once." Show the sandbox capture and payout |
 | 0:45–1:45 | Send money → "Safe Account Services", 3000, the bank-officer script | "Now Kamla has a 'bank officer' on the phone." Show the question card and the hold message being read aloud. Switch to Family view: "Asha, her daughter, sees exactly why: Kamla's words, the warning signs, her answers." Decline. Show the sandbox authorisation voided: "The money never left. Kamla was never charged." |
 | 1:45–2:25 | EXPERIMENTS charts | "We tested 8 detector designs on 112 scenarios, including victims coached to lie. Bank-style rules catch 56% of scams and never hold one for the family. Pauseline catches 95%, holds 74% for the family, and holds zero legitimate payments, even with speech-recognition errors." Show `docs/figures/results-test.png` |
-| 2:25–3:00 | Architecture diagram | "The AI only adds caution. Money moves only by rule or by family. Free, on PayPal, and built to plug into any wallet." |
+| 2:25–3:00 | Architecture diagram | "The AI can't move money. Money moves only by rule or by family. Free, on PayPal, and built to plug into any wallet." |

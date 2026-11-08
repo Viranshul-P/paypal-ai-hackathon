@@ -5,7 +5,7 @@
 
 ## The idea in one paragraph
 
-Scammers now talk people into sending money themselves: a "bank officer" with a safe account, "digital arrest" video calls, a grandchild in trouble. Fraud checks miss this because the real owner is paying. **Pauseline** checks each payment for scam pressure in the payer's own words (English/Hindi/Hinglish) and in its context, and asks one or two yes/no questions when unsure. **Every payment is held as a PayPal authorisation**: normal ones are captured and paid out at once; risky ones wait for a cooling-off period or for a **trusted family member**, who approves (capture + payout) or declines (void, never charged). The AI can only add caution. **Total cost: $0.**
+Scammers now talk people into sending money themselves: a "bank officer" with a safe account, "digital arrest" video calls, a grandchild in trouble. Fraud checks miss this because the real owner is paying. **Pauseline** checks each payment for scam pressure in the payer's own words (English/Hindi/Hinglish) and in its context, and asks one or two yes/no questions when unsure. **Every payment is held as a PayPal authorisation**: normal ones are captured and paid out at once; risky ones wait for a cooling-off period or for a **trusted family member**, who approves (capture + payout) or declines (void, never charged). No AI can move money on its own. **Total cost: $0.**
 
 ## Status (7 Nov, evening): development complete
 
@@ -17,7 +17,7 @@ Scammers now talk people into sending money themselves: a "bank officer" with a 
 | LLM layer: gpt-oss-120b on Groq's free tier, cache, quota guard, fallback | ✅ Live-tested |
 | Web app: payer screens (voice, Hindi), family dashboard, setup, demo reset | ✅ |
 | Benchmark: 112 scenarios, 8 conditions, 3 LLMs, sweeps, speech-noise robustness | ✅ Final test results in EXPERIMENTS.md |
-| Tests | ✅ 28 passing |
+| Tests | ✅ 34 passing |
 | Deployment files (render.yaml, webhook script, DEPLOY.md) | ✅ Ready, not yet deployed |
 | Submission kit (Devpost + Unstop text, video script) | ✅ docs/SUBMISSION.md |
 
@@ -31,9 +31,9 @@ Scammers now talk people into sending money themselves: a "bank officer" with a 
 
 | # | Task | Who | By |
 |---|---|---|---|
-| 1 | `git push` the `pauseline` branch, then merge it into `main` | Viranshul | now |
-| 2 | Make the repo public. Optionally rotate the PayPal secret and Groq key first, since both were shared in chat | Viranshul | 8 Nov |
-| 3 | Deploy on Render (follow `docs/DEPLOY.md`), then register webhooks with `scripts/register_webhook.py` | Friend + Viranshul | 9–10 Nov |
+| 1 | ~~`git push` the `pauseline` branch, then merge it into `main`~~ Done | Viranshul | done |
+| 2 | Rotate the PayPal secret and Groq key, then make the repo public | Viranshul | 8 Nov |
+| 3 | Deploy on Railway (follow `docs/DEPLOY.md`), then register webhooks with `scripts/register_webhook.py` | Friend + Viranshul | 9–10 Nov |
 | 4 | Put the live URL in README.md and docs/SUBMISSION.md | Anyone | after deploy |
 | 5 | Talk to 3–5 families about scam calls; add 2–3 quotes to the README and the deck | Everyone | 10 Nov |
 | 6 | A Hindi speaker checks the Hindi/Hinglish sentences in `eval/scenarios/build_v1.py` and `src/pauseline/risk/training_data.py` | Kuldeep | 10 Nov |
@@ -46,7 +46,7 @@ Scammers now talk people into sending money themselves: a "bank officer" with a 
 
 - **AI:** our scikit-learn model, plus Groq's free tier: about 1,000 requests/day and 8,000 tokens/min per model, guarded and cached.
 - **PayPal:** free sandbox.
-- **Hosting:** Render free tier (a hackathon sponsor).
+- **Hosting:** Railway trial credit ($5, no card).
 - **Video:** YouTube.
 - **Speech:** the browser's built-in Web Speech API.
 

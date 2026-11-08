@@ -4,7 +4,7 @@
 
 > Status: hackathon build (Threws Odyssey 2026 and PayPal AI Hackathon). PayPal **sandbox** only, so no real money moves. **Free to run:** our own on-device ML model plus an open-weight LLM on Groq's free tier, with no paid APIs.
 >
-> **Live demo:** TODO (Render URL) · **Results:** [EXPERIMENTS.md](EXPERIMENTS.md) · **Deploy:** [docs/DEPLOY.md](docs/DEPLOY.md)
+> **Live demo:** TODO (Railway URL) · **Results:** [EXPERIMENTS.md](EXPERIMENTS.md) · **Deploy:** [docs/DEPLOY.md](docs/DEPLOY.md)
 
 ## The problem
 
@@ -31,13 +31,13 @@ Conventional fraud checks look for stolen accounts. Here the owner is the one pa
    |---|---|
    | Nothing unusual | Captured at once, then sent to the recipient with PayPal Payouts |
    | Unusual context only (new payee, big amount) | One or two quick questions, then released if the answers and the AI find nothing wrong |
-   | Some warning signs | **Cooling-off.** The family member is told, and the payment is released automatically later unless they decline. If the LLM is unavailable, unusual context alone also gets a cooling-off |
+   | Some warning signs | **Cooling-off.** The payment appears in the family member's view (with an optional browser alert), and is released automatically later unless they decline. If the LLM is unavailable, unusual context alone also gets a cooling-off |
    | Strong warning signs in the words, or risky answers | **Held for the family member**, who sees the payer's words, the warning signs and the answers, then approves or declines |
    | Blocked payee | Voided at once |
 
    A declined payment is **voided**, so the payer is never charged.
 
-**Safety principle:** every AI component can only *add* caution. Money moves only through deterministic policy or a human decision.
+**Safety principle:** no AI component can move money. Money moves only through deterministic policy or a human decision, and family decisions need the trusted contact's PIN. AI signals raise risk, with one tuned exception: while the LLM is working, risk from unusual context alone is capped lower, so a clean but unusual payment can go through after questions. If the LLM is unavailable, the stricter cap returns.
 
 ## How it uses PayPal
 
@@ -59,7 +59,7 @@ Conventional fraud checks look for stolen accounts. Here the owner is the one pa
 | **Open-weight LLM** | **gpt-oss-120b on Groq's free tier** (chosen over gpt-oss-20b and Qwen 3.8 27B on our dev split). Gives a second opinion on risk, writes the calm message to the payer and the summary for the family in their language, and picks the most useful questions. Built for a shared free quota: answer cache, request/token budget guard, per-visitor rate limit, and automatic fallback to the on-device model. Can also run locally through Ollama |
 | Speech | Browser Web Speech API for voice input and spoken results |
 
-If the free LLM quota ever runs out, Pauseline keeps working on the on-device model, and the header shows which mode is active.
+If the free LLM quota ever runs out, Pauseline keeps working on the on-device model, and the page footer shows which mode is active.
 
 AI tools used to build it: Claude Code assisted with code, research and documentation, including drafting the benchmark scenarios. The team made the design decisions and reviewed all output.
 
@@ -101,12 +101,12 @@ cp .env.example .env          # optional: PayPal sandbox keys and a free Groq ke
 uv run pauseline              # http://127.0.0.1:8000 (first start trains the classifier, ~8 s)
 ```
 
-With no keys it runs fully offline: a fake PayPal with the same state rules, and the on-device model. The header shows the active mode.
+With no keys it runs fully offline: a fake PayPal with the same state rules, and the on-device model. The page footer shows the active mode.
 
 **Try it:**
 - **Send money:** pay "Rahul" 80 for "college books" → released at once.
 - **Send money:** pay "Safe Account Services" 3000 with "The bank officer said my account is hacked, I must move my savings to a safe account, he is still on the phone" → questions, then held.
-- **Family view:** see the hold with the reasons, then decline it → the PayPal authorisation is voided.
+- **Family view:** enter the family PIN (`1234` unless `PAUSELINE_FAMILY_PIN` is set), see the hold with the reasons, then decline it → the PayPal authorisation is voided.
 
 ```bash
 uv run pytest                                  # tests
@@ -128,7 +128,7 @@ src/pauseline/
 eval/
   scenarios/   build_v1.py → v1.jsonl (frozen, sha256 in MANIFEST.json)
   run.py · sweep.py · sweep_llm.py · check_leakage.py · perturb.py (speech noise) · charts.py
-render.yaml · scripts/register_webhook.py · docs/DEPLOY.md · docs/SUBMISSION.md
+Dockerfile · railway.json · render.yaml · scripts/register_webhook.py · docs/DEPLOY.md · docs/SUBMISSION.md
 tests/
 ```
 

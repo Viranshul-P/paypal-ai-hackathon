@@ -131,7 +131,7 @@ frontend/      React + Tailwind source, modular components adapted from Watermel
 eval/
   scenarios/   build_v1.py → v1.jsonl (frozen, sha256 in MANIFEST.json)
   run.py · sweep.py · sweep_llm.py · check_leakage.py · perturb.py (speech noise) · charts.py
-Dockerfile · railway.json · render.yaml · scripts/register_webhook.py · docs/DEPLOY.md · docs/SUBMISSION.md
+Dockerfile · railway.json · render.yaml · scripts/register_webhook.py · docs/DEPLOY.md
 tests/
 ```
 

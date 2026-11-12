@@ -10,3 +10,10 @@ eval/results/*/
 .DS_Store
 models/
 node_modules/
+
+# Internal notes (kept locally, not part of the published project)
+PLAN.md
+PRODUCT.md
+docs/SUBMISSION.md
+.impeccable/
+.claude/

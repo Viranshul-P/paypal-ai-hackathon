@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import { Mic, UserPlus } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
 import { api } from '../../lib/api';
 import { useConfig } from '../../lib/config';
@@ -38,6 +39,16 @@ function initials(name: string) {
     .toUpperCase();
 }
 
+// One-click examples for trying the app: /send?demo=normal or /send?demo=scam
+const DEMOS: Record<string, { payee: string; amount: string; statement: string }> = {
+  normal: { payee: 'Rahul', amount: '80', statement: "Rahul's college books" },
+  scam: {
+    payee: 'Safe Account Services',
+    amount: '3000',
+    statement: 'The bank officer said my account is hacked, I must move my savings to a safe account, he is still on the phone',
+  },
+};
+
 export function DetailsStep({ payees, busy, error, onError, onContinue }: DetailsStepProps) {
   const { t, lang } = useI18n();
   const config = useConfig();
@@ -48,6 +59,19 @@ export function DetailsStep({ payees, busy, error, onError, onContinue }: Detail
   const [newEmail, setNewEmail] = useState('');
   const [listening, setListening] = useState(false);
   const recognition = useRef<any>(null);
+
+  const [params] = useSearchParams();
+  const demo = DEMOS[params.get('demo') ?? ''];
+  const demoApplied = useRef(false);
+  useEffect(() => {
+    if (!demo || demoApplied.current || !payees.length) return;
+    const p = payees.find((x) => x.name === demo.payee);
+    if (!p) return;
+    demoApplied.current = true;
+    setPayeeId(p.id);
+    setAmount(demo.amount);
+    setStatement(demo.statement);
+  }, [demo, payees]);
 
   // A message about the form goes away as soon as the person changes anything.
   useEffect(() => {

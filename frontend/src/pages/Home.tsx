@@ -89,6 +89,23 @@ export default function Home() {
         <Door to="/family" icon={Users} title={t('Family view', 'फ़ैमिली व्यू')} body={t(`For ${config.contact_name}: paused payments`, `${config.contact_name} के लिए: रुके हुए पेमेंट`)} />
 
         <Card>
+          <h2 className="text-2xl font-extrabold">{t('Try it in 2 minutes', '2 मिनट में आज़माएं')}</h2>
+          <p className="mt-1 text-ink-2">
+            {t(`Each button fills in an example for you. Then open the Family view to see what ${config.contact_name} sees.`, `हर बटन एक उदाहरण भर देता है। फिर देखें कि ${config.contact_name} को क्या दिखता है।`)}
+          </p>
+          <div className="mt-3 grid gap-2 sm:grid-cols-2">
+            <Link to="/send?demo=normal" className="rounded-card bg-action-soft p-3 font-semibold text-action no-underline hover:bg-tint">
+              <span className="block">{t('1. A normal payment', '1. सामान्य पेमेंट')}</span>
+              <span className="block text-sm font-normal text-ink-2">{t('80 to Rahul for books: goes straight through', 'राहुल को किताबों के लिए 80: तुरंत चला जाता है')}</span>
+            </Link>
+            <Link to="/send?demo=scam" className="rounded-card bg-action-soft p-3 font-semibold text-action no-underline hover:bg-tint">
+              <span className="block">{t('2. A scam in progress', '2. चल रही ठगी')}</span>
+              <span className="block text-sm font-normal text-ink-2">{t('"Move your savings to a safe account": gets held', '"अपनी बचत सुरक्षित खाते में डालें": रोक दिया जाता है')}</span>
+            </Link>
+          </div>
+        </Card>
+
+        <Card>
           <h2 className="text-2xl font-extrabold">{t('How it works', 'यह कैसे काम करता है')}</h2>
           <ol className="mt-3 list-none space-y-3 p-0">
             {steps.map((step, i) => (

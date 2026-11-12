@@ -6,6 +6,16 @@
 >
 > **Live demo:** https://pauseline-production.up.railway.app · **Results:** [EXPERIMENTS.md](EXPERIMENTS.md) · **Deploy:** [docs/DEPLOY.md](docs/DEPLOY.md)
 
+## Try it in two minutes (for judges)
+
+Open the **[live demo](https://pauseline-production.up.railway.app)**. It is a PayPal **sandbox** build, so no real money moves. The demo is one shared household: **Kamla** pays, her daughter **Asha** is the trusted contact.
+
+1. **Normal payment:** *Send money* → Rahul, 80, "college books". It is released at once.
+2. **Scam payment:** *Send money* → Safe Account Services, 3000, "The bank officer said my account is hacked, I must move my savings to a safe account, he is still on the phone". Answer the two questions. The payment is held, and PayPal keeps the funds as an authorisation.
+3. **Family view:** open *Family*, enter the PIN `1234`, read the warning signs, then **decline**. The authorisation is voided and the payer is never charged.
+
+If the shared demo looks cluttered, use *Reset demo* on the Setup page. To run it yourself, see [Run it](#run-it) below: no keys are needed.
+
 ## The problem
 
 Today's biggest payment scams don't steal passwords. The real account owner makes the payment while a scammer directs them:
